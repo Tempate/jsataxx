@@ -1,5 +1,4 @@
-const { createMove } = require('./move');
-const Types = require('./types')
+const Types = require('./types');
 
 const MoveType  = Types.MoveType
 const StoneType = Types.StoneType
