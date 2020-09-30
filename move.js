@@ -2,16 +2,11 @@ const MoveType = require('./types').MoveType
 const Board = require('./board')
 
 function createMove(to, from) {
-    if (from == undefined) {
+    if (from == undefined || Board.distance(from, to) == 1) {
         type = MoveType.Single
         from = -1
     } else {
-        if (Board.distance(from, to) == 1) {
-            type = MoveType.Single
-            from = -1
-        } else {
-            type = MoveType.Double
-        }
+        type = MoveType.Double
     }
 
     return {

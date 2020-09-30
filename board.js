@@ -1,3 +1,4 @@
+const { createMove } = require('./move');
 const Types = require('./types')
 
 const MoveType  = Types.MoveType
@@ -8,11 +9,7 @@ const initialFen = "x5o/7/7/7/7/7/o5x x 0 1";
 
 
 function createBoard() {
-    let stones = [];
-
-    for (let i = 0; i < 49; i++) {
-        stones.push(StoneType.Blank);
-    }
+    let stones = new Array(49).fill(StoneType.Blank);
 
     let turn = Player.Black;
     let ply = 0;
@@ -143,44 +140,45 @@ function createBoard() {
         },
 
         isLegal: function(move) {
-            const friendlyStoneType = (this.turn == Player.White) ? StoneType.White : StoneType.Black;
+            const stoneType = (this.turn == Player.White) ? StoneType.White : StoneType.Black;
 
             if (move.type == MoveType.Null) {
     
                 // Iterate through all blank squares and check that no friendly stone
                 // can move or jump to it.
                 for (let square = 0; square < stones.length; square++) {
-                    if (stones[square] != StoneType.Blank)
-                        continue;
-    
-                    if (this.surroundingStones(square, friendlyStoneType, 2).length > 0)
+                    if (stones[square] == StoneType.Blank && this.surroundingStones(square, stoneType, 2).length > 0) {
                         return false; 
+                    }
                 }
     
                 return true;
             }
     
             // Check that move.to's value is within range
-            if (move.to < 0 || move.to >= 49)
+            if (move.to < 0 || move.to >= 49) {
                 return false;
+            }
     
             // Check that the destination is empty
-            if (stones[move.to] != StoneType.Blank)
+            if (stones[move.to] != StoneType.Blank) {
                 return false;
+            }
     
             switch (move.type) {
                 case MoveType.Single:
     
                     // Check that there is an adjacent, friendly stone to make the move
-                    return this.surroundingStones(move.to, friendlyStoneType, 1).length > 0;
+                    return this.surroundingStones(move.to, stoneType, 1).length > 0;
                 
                 case MoveType.Double:
                     // Check that move.from's value is within range
-                    if (move.from < 0 || move.from >= 49)
+                    if (move.from < 0 || move.from >= 49) {
                         return false;
+                    }
     
                     // Check that there's a friendly stone at the departure square
-                    return stones[move.from] == friendlyStoneType;
+                    return stones[move.from] == stoneType;
             }
     
             return false;
@@ -190,12 +188,21 @@ function createBoard() {
             let friendlyStoneType;
             let hostileStoneType;
     
-            if (this.turn == Player.White) {
-                friendlyStoneType = StoneType.White;
-                hostileStoneType = StoneType.Black;
-            } else {
-                friendlyStoneType = StoneType.Black;
-                hostileStoneType = StoneType.White;
+            switch (this.turn) {
+                case Player.White:
+                    friendlyStoneType = StoneType.White;
+                    hostileStoneType = StoneType.Black;
+
+                    // Swap the turn
+                    this.turn = Player.Black;
+                    break;
+                case Player.Black:
+                    friendlyStoneType = StoneType.Black;
+                    hostileStoneType = StoneType.White;
+
+                    // Swap the turn
+                    this.turn = Player.White;
+                    break;
             }
     
             let newFiftyMovesCounter = 0;
@@ -221,17 +228,13 @@ function createBoard() {
                     break;
             }
     
-            // Swap the turn
-            this.turn = (this.turn == Player.White) ? Player.Black : Player.White;
-    
             // Update the fifty-moves counter
             fiftyMovesCounter = newFiftyMovesCounter;
 
             ply++;
         },
 
-        reachableSquares: function(coordinate) {
-            const square = coordinateToSquare(coordinate);
+        reachableSquares: function(square) {
             return this.surroundingStones(square, StoneType.Blank, 2);
         },
 
@@ -241,6 +244,10 @@ function createBoard() {
         // The margin indicates how big those surroundings are.
         // For instance, a margin of 1 would comprehend adjacent squares.
         surroundingStones: function(square, type, margin) {
+            console.assert(square >= 0 && square < 49);
+            console.assert(type == StoneType.White || type == StoneType.Black || type == StoneType.Blank || type == StoneType.Gap);
+            console.assert(margin >= 1 && margin <= 3);
+
             let squares = [];
 
             const moveToX = square % 7;
@@ -250,96 +257,60 @@ function createBoard() {
                 for (let x = Math.max(0, moveToX - margin); x <= Math.min(6, moveToX + margin); x++) {
                     const pos = y * 7 + x;
 
-                    if (pos != square && stones[pos] == type)
+                    if (pos != square && stones[pos] == type) {
                         squares.push(pos);
+                    }
                 }
             }
 
             return squares;
         },
 
-        //List with the possible moves for a given stone
+        // List with the possible moves for a given stone
         stoneMoves: function(square) {
-            console.assert(square >= 0 && square < 49)
-            console.assert(stones[square] != StoneType.Gap && stones[square] != StoneType.Blank)
+            console.assert(square >= 0 && square < 49);
+            console.assert(stones[square] == StoneType.White || stones[square] == StoneType.Black);
 
-            let mvs = []
-
-            const x = square / 7
-            const y = square % 7
-
-            for (var i = -2; i <= 2; i++) {
-                for (var j = -2; j <= 2; j++) {
-                    const newx = x + i
-                    const newy = y + j
-                    if (newx < 0 || newx >= 7 || newy < 0 || newy >= 7) {
-                        continue
-                    }
-
-                    const newsqr = 7*newx + newy
-                    if (stones[newsqr] == StoneType.Blank) {
-                        mvs.push(createMove(newsqr, square))
-                    }
-                }
-            }
-
-            return mvs
+            return this.reachableSquares(square, StoneType.Blank, 2).map(squareTo => createMove(squareTo, square));
         },
 
         //Detects if a side has available moves
         hasMoves: function(side) {
-            //LOL
-            if (side == Player.White) {
-                for (var i = 0; i < 49; i++) {
-                    if (stones[i] == StoneType.White) {
-                        const mvs = this.stoneMoves(i)
-                        if (mvs.length != 0) {
-                            return true
-                        }
-                    }
-                }
-            } else {
-                for (var i = 0; i < 49; i++) {
-                    if (stones[i] == StoneType.Black) {
-                        const mvs = this.stoneMoves(i)
-                        if (mvs.length != 0) {
-                            return true
-                        }
-                    }
+            console.assert(side == Player.White || side == Player.Black);
+
+            const stoneType = (side == Player.White) ? StoneType.White : StoneType.Black;
+
+            for (let square = 0; square < 49; square++) {
+                if (stones[square] == stoneType && this.stoneMoves(square).length > 0) {
+                    return true;
                 }
             }
 
-            return false
+            return false;
         },
 
         toString: function() {
-            let boardString = ""
-    
-            for (let y = 6; y >= 0; y--) {
-                let row = ""
-            
-                for (let x = 0; x < 7; x++) {
-                    const square = y * 7 + x
-    
-                    switch (board.stones[square]) {
-                        case StoneType.Blank:
-                            row += "_";
-                            break;
-                        case StoneType.Gap:
-                            row += "*";
-                            break;
-                        case StoneType.Black:
-                            row += "x";
-                            break;
-                        case StoneType.White:
-                            row += "o";
-                            break;
-                    }
-    
-                    row += " ";
+            let boardString = "";
+
+            for (let square = 0; square < 49; square++) {
+                switch (this.stones[square]) {
+                    case StoneType.Blank:
+                        row += "_";
+                        break;
+                    case StoneType.Gap:
+                        row += "*";
+                        break;
+                    case StoneType.Black:
+                        row += "x";
+                        break;
+                    case StoneType.White:
+                        row += "o";
+                        break;
                 }
-            
-                boardString += row + "\n"
+
+                if (square != 0 && square % 7 == 0) {
+                    boardString += row + "\n";
+                }
             }
     
             return boardString
