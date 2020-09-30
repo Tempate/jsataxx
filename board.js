@@ -288,6 +288,39 @@ function createBoard() {
             return false;
         },
 
+        //Determine if the game has ended and the proper result
+        result: function() {
+
+            let stoneCnt = [0, 0]
+            for (var i = 0; i < 49; i++) {
+                if (stones[i] == StoneType.White) {
+                    stoneCnt[Player.White]++
+                } else if (stones[i] == StoneType.Black) {
+                    stoneCnt[Player.Black]++
+                }
+            }
+
+            const sum = stoneCnt[Player.Black] + stoneCnt[Player.White]
+
+            if (sum == 0) {
+                console.assert(false, "It's impossible for both sides to have 0 pieces")
+            } else if (stoneCnt[Player.White] == 0) {
+                return Player.Black
+            } else if (stoneCnt[Player.Black] == 0) {
+                return Player.White
+            } else if (sum == 49) {
+                console.assert(stoneCnt[Player.White] != stoneCnt[Player.Black], "The board must have and odd number of blanks")
+
+                if (stoneCnt[Player.White] > stoneCnt[Player.Black]) {
+                    return Player.White
+                } else {
+                    return Player.Black
+                }
+            }
+
+            return false
+        },
+
         toString: function() {
             let boardString = "";
 
