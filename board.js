@@ -184,23 +184,25 @@ function createBoard() {
         },
 
         make: function(move) {
+            let opponent;
             let friendlyStoneType;
             let hostileStoneType;
+
     
             switch (this.turn) {
                 case Player.White:
                     friendlyStoneType = StoneType.White;
                     hostileStoneType = StoneType.Black;
 
-                    // Swap the turn
-                    this.turn = Player.Black;
+                    opponent = Player.Black;
+
                     break;
                 case Player.Black:
                     friendlyStoneType = StoneType.Black;
                     hostileStoneType = StoneType.White;
 
-                    // Swap the turn
-                    this.turn = Player.White;
+                    opponent = Player.White;
+
                     break;
             }
     
@@ -225,6 +227,11 @@ function createBoard() {
                     });
     
                     break;
+            }
+
+            // Swap the turn
+            if (this.hasMoves(opponent)) {
+                this.turn = opponent;
             }
     
             // Update the fifty-moves counter
@@ -270,7 +277,7 @@ function createBoard() {
             console.assert(square >= 0 && square < 49);
             console.assert(stones[square] == StoneType.White || stones[square] == StoneType.Black);
 
-            return this.reachableSquares(square, StoneType.Blank, 2).map(squareTo => createMove(squareTo, square));
+            return this.reachableSquares(square).map(squareTo => this.createMove(squareTo, square));
         },
 
         // Detects if a side has available moves
@@ -280,7 +287,7 @@ function createBoard() {
             const stoneType = (side == Player.White) ? StoneType.White : StoneType.Black;
 
             for (let square = 0; square < 49; square++) {
-                if (stones[square] == stoneType && this.stoneMoves(square).length > 0) {
+                if (stones[square] == stoneType && this.reachableSquares(square).length > 0) {
                     return true;
                 }
             }
