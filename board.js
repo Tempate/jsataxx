@@ -273,7 +273,7 @@ function createBoard() {
             return this.reachableSquares(square, StoneType.Blank, 2).map(squareTo => createMove(squareTo, square));
         },
 
-        //Detects if a side has available moves
+        // Detects if a side has available moves
         hasMoves: function(side) {
             console.assert(side == Player.White || side == Player.Black);
 
@@ -288,37 +288,35 @@ function createBoard() {
             return false;
         },
 
-        //Determine if the game has ended and the proper result
+        // Determine if the game has ended and the proper result
         result: function() {
+            let stoneCount = [0, 0]
 
-            let stoneCnt = [0, 0]
-            for (var i = 0; i < 49; i++) {
+            for (let i = 0; i < 49; i++) {
                 if (stones[i] == StoneType.White) {
-                    stoneCnt[Player.White]++
+                    stoneCount[Player.White]++
                 } else if (stones[i] == StoneType.Black) {
-                    stoneCnt[Player.Black]++
+                    stoneCount[Player.Black]++
                 }
             }
 
-            const sum = stoneCnt[Player.Black] + stoneCnt[Player.White]
+            const sum = stoneCount[Player.Black] + stoneCount[Player.White]
 
-            if (sum == 0) {
-                console.assert(false, "It's impossible for both sides to have 0 pieces")
-            } else if (stoneCnt[Player.White] == 0) {
-                return Player.Black
-            } else if (stoneCnt[Player.Black] == 0) {
-                return Player.White
-            } else if (sum == 49) {
-                console.assert(stoneCnt[Player.White] != stoneCnt[Player.Black], "The board must have and odd number of blanks")
+            switch (sum) {
+                case 0:
+                    console.assert(false, "It's impossible for both sides to have 0 pieces");
+                case 49:
+                    console.assert(stoneCount[Player.White] != stoneCount[Player.Black], "The board must have and odd number of blanks")
+                    return (stoneCount[Player.White] > stoneCount[Player.Black]) ? Player.White : Player.Black;
+                default:
+                    if (stoneCount[Player.White] == 0) {
+                        return Player.Black
+                    } else if (stoneCount[Player.Black] == 0) {
+                        return Player.White
+                    }
 
-                if (stoneCnt[Player.White] > stoneCnt[Player.Black]) {
-                    return Player.White
-                } else {
-                    return Player.Black
-                }
+                    return false;
             }
-
-            return false
         },
 
         toString: function() {
