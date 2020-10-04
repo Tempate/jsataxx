@@ -1,8 +1,8 @@
 const MoveType = require('./types').MoveType
-const Board = require('./board')
+const Util = require('./util')
 
 function createMove(to, from) {
-    if (from == undefined || Board.distance(from, to) == 1) {
+    if (from == undefined || Util.distance(from, to) == 1) {
         type = MoveType.Single
         from = -1
     } else {
@@ -17,9 +17,9 @@ function createMove(to, from) {
         toString: function() {
             switch (type) {
                 case MoveType.Single:
-                    return Board.squareToCoordinate(to)
+                    return Util.squareToCoordinate(to)
                 case MoveType.Double:
-                    return Board.squareToCoordinate(from) + Board.squareToCoordinate(to)
+                    return Util.squareToCoordinate(from) + Util.squareToCoordinate(to)
                 case MoveType.Null:
                     return '0000'
             }
@@ -30,9 +30,9 @@ function createMove(to, from) {
 function createMoveFromString(moveString) {
     switch (moveString.length) {
         case 2:
-            return createMove(Board.coordinateToSquare(moveString))
+            return createMove(Util.coordinateToSquare(moveString))
         case 4:
-            return createMove(Board.coordinateToSquare(moveString.substr(2,2)), Board.coordinateToSquare(moveString.substr(0,2)))
+            return createMove(Util.coordinateToSquare(moveString.substr(2,2)), Util.coordinateToSquare(moveString.substr(0,2)))
     }
 }
 
