@@ -329,25 +329,29 @@ function createBoard() {
         toString: function() {
             let boardString = "";
 
-            for (let square = 0; square < 49; square++) {
-                switch (this.stones[square]) {
-                    case StoneType.Blank:
-                        row += "_";
-                        break;
-                    case StoneType.Gap:
-                        row += "*";
-                        break;
-                    case StoneType.Black:
-                        row += "x";
-                        break;
-                    case StoneType.White:
-                        row += "o";
-                        break;
+            for (let y = 6; y >= 0; y--) {
+                for (let x = 0; x < 7; x++) {
+                    let idx = 7 * y + x;
+                    switch (this.stones[idx]) {
+                        case StoneType.Blank:
+                            boardString += "-";
+                            break;
+                        case StoneType.Gap:
+                            boardString += " ";
+                            break;
+                        case StoneType.Black:
+                            boardString += "x";
+                            break;
+                        case StoneType.White:
+                            boardString += "o";
+                            break;
+                        default:
+                            boardString += "?";
+                            break;
+                    }
                 }
 
-                if (square != 0 && square % 7 == 0) {
-                    boardString += row + "\n";
-                }
+                boardString += "\n";
             }
     
             return boardString
