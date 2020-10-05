@@ -15,7 +15,7 @@ function createMove(to, from) {
         type,
 
         toString: function() {
-            switch (type) {
+            switch (this.type) {
                 case MoveType.Single:
                     return Util.squareToCoordinate(to)
                 case MoveType.Double:
