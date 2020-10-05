@@ -1,4 +1,5 @@
 const Types = require('./types');
+const Move = require('./move');
 
 const MoveType  = Types.MoveType
 const StoneType = Types.StoneType
@@ -431,6 +432,67 @@ class Board {
         }
 
         return boardString
+    }
+
+    legalMoves() {
+        if (this.result()) {
+            return [];
+        }
+
+        let moves = [];
+
+        for (let y = 0; y < 7; y++) {
+            for (let x = 0; x < 7; x++) {
+                let idx = 7 * y + x;
+
+                // Single moves
+                if (this.stones[idx] == StoneType.Blank) {
+                    for (let i = 0; i < single_offsets.length; i++) {
+                        let nx = x + single_offsets[i][0];
+                        let ny = y + single_offsets[i][1];
+
+                        // We went off the edge of the board
+                        if (nx < 0 || nx > 6 || ny < 0 || ny > 6) {
+                            continue;
+                        }
+
+                        let nidx = 7 * ny + nx;
+
+                        if ((this.turn == Player.Black && this.stones[nidx] == StoneType.Black) ||
+                            (this.turn == Player.White && this.stones[nidx] == StoneType.White)) {
+                            moves.push(Move.createMove(idx));
+                            break;
+                        }
+                    }
+                }
+
+                // Double moves
+                if ((this.turn === Player.Black && this.stones[idx] === StoneType.Black) ||
+                    (this.turn === Player.White && this.stones[idx] === StoneType.White)) {
+                    for (let i = 0; i < double_offsets.length; i++) {
+                        let nx = x + double_offsets[i][0];
+                        let ny = y + double_offsets[i][1];
+
+                        // We went off the edge of the board
+                        if (nx < 0 || nx > 6 || ny < 0 || ny > 6) {
+                            continue;
+                        }
+
+                        let nidx = 7 * ny + nx;
+                        if (this.stones[nidx] === StoneType.Blank) {
+                            moves.push(Move.createMove(nidx, idx));
+                        }
+                    }
+                }
+            }    
+        }
+
+        // Pass
+        if (moves.length == 0) {
+            moves.push(Move.createMove());
+        }
+
+        return moves;
     }
 }
 
