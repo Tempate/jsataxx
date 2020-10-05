@@ -3,8 +3,41 @@ const Types = require('./types');
 const MoveType  = Types.MoveType
 const StoneType = Types.StoneType
 const Player    = Types.Player
+const Result    = Types.Result
 
 const initialFen = "x5o/7/7/7/7/7/o5x x 0 1";
+
+const single_offsets = [
+    [-1,-1],
+    [-1,0],
+    [-1,1],
+    [0,-1],
+    [0,1],
+    [1,-1],
+    [1,0],
+    [1,1]
+];
+
+const double_offsets = [
+    [-2,-2],
+    [-2,-1],
+    [-2,0],
+    [-2,1],
+    [-2,2],
+    [-1,-2],
+    [-1,2],
+    [0,-2],
+    [0,2],
+    [1,-2],
+    [1,2],
+    [2,-2],
+    [2,-1],
+    [2,0],
+    [2,1],
+    [2,2]
+];
+
+const move_offsets = single_offsets.concat(double_offsets);
 
 
 class Board {
@@ -300,37 +333,65 @@ class Board {
         return false;
     }
 
+    movesLeft() {
+        for (let y = 0; y < 7; y++) {
+            for (let x = 0; x < 7; x++) {
+                let idx = 7 * y + x;
+
+                if (this.stones[idx] != StoneType.Blank) {
+                    continue;
+                }
+
+                // See if a stone can move here
+                for (let i = 0; i < move_offsets.length; i++) {
+                    let nx = x + move_offsets[i][0];
+                    let ny = y + move_offsets[i][1];
+
+                    // We went off the edge of the board
+                    if (nx < 0 || nx > 6 || ny < 0 || ny > 6) {
+                        continue;
+                    }
+
+                    let nidx = 7 * ny + nx;
+
+                    if (this.stones[nidx] == StoneType.Black || this.stones[nidx] == StoneType.White) {
+                        return true;
+                    }
+                }
+            }    
+        }
+
+        return false;
+    }
+
     // Determine if the game has ended and the proper result
     result() {
-        let stoneCount = [0, 0]
+        let numBlack = 0;
+        let numWhite = 0;
 
         for (let i = 0; i < 49; i++) {
             if (this.stones[i] == StoneType.White) {
-                stoneCount[Player.White]++
+                numWhite++;
             } else if (this.stones[i] == StoneType.Black) {
-                stoneCount[Player.Black]++
+                numBlack++;
             }
         }
 
-        const sum = stoneCount[Player.Black] + stoneCount[Player.White]
-
-        switch (sum) {
-            case 0:
-                console.assert(false, "It's impossible for both sides to have 0 pieces");
-
-            case 49:
-                console.assert(stoneCount[Player.White] != stoneCount[Player.Black], "The board must have and odd number of blanks")
-
-                return (stoneCount[Player.White] > stoneCount[Player.Black]) ? Player.White : Player.Black;
-            default:
-                if (stoneCount[Player.White] == 0) {
-                    return Player.Black
-                } else if (stoneCount[Player.Black] == 0) {
-                    return Player.White
-                }
-
-                return false;
+        if (!this.movesLeft() || numBlack == 0 || numWhite == 0) {
+            if (numBlack > numWhite) {
+                return Result.BlackWin;
+            } else if (numWhite > numBlack) {
+                return Result.WhiteWin;
+            } else {
+                return Result.Draw;
+            }
         }
+
+        if (this.fiftyMovesCounter >= 100) {
+            return Result.Draw;
+        }
+
+        return Result.None;
     }
 
     toString() {

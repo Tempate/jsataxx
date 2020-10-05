@@ -16,4 +16,11 @@ const StoneType = {
     Gap: 3
 }
 
-module.exports = {MoveType, Player, StoneType}
+const Result = {
+    None: 0,
+    Draw: 1,
+    BlackWin: 2,
+    WhiteWin: 3
+}
+
+module.exports = {MoveType, Player, StoneType, Result}
