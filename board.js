@@ -434,4 +434,14 @@ class Board {
     }
 }
 
-module.exports = {Board, initialFen}
+function copy(dst, src) {
+    dst.turn = src.turn;
+    dst.ply = src.ply;
+    dst.fiftyMovesCounter = src.fiftyMovesCounter;
+
+    for (let i = 0; i < 49; i++) {
+        dst.stones[i] = src.stones[i];
+    }
+}
+
+module.exports = {Board, initialFen, copy}
