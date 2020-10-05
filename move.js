@@ -2,7 +2,9 @@ const MoveType = require('./types').MoveType
 const Util = require('./util')
 
 function createMove(to, from) {
-    if (from == undefined || Util.distance(from, to) == 1) {
+    if (to == undefined) {
+        type = MoveType.Null;
+    } else if (from == undefined || Util.distance(from, to) == 1) {
         type = MoveType.Single
         from = -1
     } else {
