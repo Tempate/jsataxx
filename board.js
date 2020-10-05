@@ -46,15 +46,8 @@ class Board {
         this.turn = Player.Black;
         this.ply = 0;
         this.fiftyMovesCounter = 0;
-        this.stones = [
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-            StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,StoneType.Blank,
-        ];
+
+        this.stones = new Array(49).fill(StoneType.Blank);
     }
 
     toFen() {
