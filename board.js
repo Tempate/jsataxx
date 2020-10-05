@@ -96,13 +96,13 @@ class Board {
         }
 
         fen += ' ';
-        fen += (turn == Player.Black) ? 'x' : 'o';
+        fen += (this.turn == Player.Black) ? 'x' : 'o';
 
         fen += ' ';
-        fen += fiftyMovesCounter.toString();
+        fen += this.fiftyMovesCounter.toString();
 
         fen += ' ';
-        fen += ply.toString();
+        fen += this.ply.toString();
 
         return fen;
     }
