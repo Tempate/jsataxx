@@ -1,26 +1,26 @@
 const MoveType = {
-    Single: 0,
-    Double: 1,
-    Null: 2
+    Single: "single",
+    Double: "double",
+    Null: "null"
 }
 
 const Player = {
-    White: 0,
-    Black: 1 
+    White: "white",
+    Black: "black"
 }
 
 const StoneType = {
-    White: 0,
-    Black: 1,
-    Blank: 2,
-    Gap: 3
+    White: "white",
+    Black: "black",
+    Blank: "blank",
+    Gap: "gap"
 }
 
 const Result = {
-    None: 0,
-    Draw: 1,
-    BlackWin: 2,
-    WhiteWin: 3
+    None: "none",
+    Draw: "draw",
+    BlackWin: "black",
+    WhiteWin: "white"
 }
 
 module.exports = {MoveType, Player, StoneType, Result}
