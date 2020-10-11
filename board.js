@@ -262,9 +262,8 @@ class Board {
 
         // Swap the turn
         if (this.hasMoves(opponent)) {
-            //this.turn = opponent;
+            this.turn = opponent;
         }
-        this.turn = opponent;
 
         // Update the fifty-moves counter
         this.fiftyMovesCounter = newFiftyMovesCounter;
