@@ -275,6 +275,17 @@ class Board {
         return this.surroundingStones(square, StoneType.Blank, 2);
     }
 
+    countCaptures(move) {
+        console.assert(this.isLegal(move));
+
+        switch (this.turn) {
+            case Player.White:
+                return this.surroundingStones(move.to, StoneType.Black, 1);
+            case Player.Black:
+                return this.surroundingStones(move.to, StoneType.White, 1);
+        }
+    }
+
     // List all the squares in the surroundings of a stone 
     // that contain stones of a given type.
 
